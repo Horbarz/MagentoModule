@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Neptune\FirstModule\Api\ProductRepositoryInterface" 
+        type="Neptune\FirstModule\Model\ProductRepository"/>
+    <preference for="Neptune\FirstModule\Api\Data\ProductInterface" 
+        type="Neptune\FirstModule\Model\Data\Product"/>
+    <preference for="Neptune\FirstModule\Api\LoginRepositoryInterface" 
+        type="Neptune\FirstModule\Model\LoginRepository"/>
+</config>

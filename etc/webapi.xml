@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+	<route url="/V2/product/getProductsById/:id" method="GET">
+		<service class="Neptune\FirstModule\Api\ProductRepositoryInterface" method="getProductById"/>
+		<resources>
+			<resource ref="anonymous"/>
+		</resources>
+	</route>	
+	<!-- Get current user details when correct login details are provided -->
+	<route url="/default/V1/badgemakerapi/authenticate" method="POST">
+       <service class="Neptune\FirstModule\Api\LoginRepositoryInterface" method="login"/>
+       <resources>
+           <resource ref="anonymous"/>
+       </resources>
+    </route>
+	<!-- Add user when correct registration details are provided -->
+	<route url="/V1/badgemakerapi/addUser" method="POST">
+       <service class="Neptune\FirstModule\Api\RegisterRepositoryInterface" method="register"/>
+       <resources>
+           <resource ref="anonymous"/>
+       </resources>
+    </route>
+</routes>
