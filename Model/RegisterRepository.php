@@ -2,12 +2,21 @@
 
 namespace Neptune\FirstModule\Model;
 
-use Magento\Framework\Exception\EmailNotConfirmedException;
+use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\AuthenticationException;
 use Magento\Customer\Api\AccountManagementInterface;
 use Neptune\FirstModule\Api\LoginRepositoryInterface;
 
-class LoginRepository implements LoginRepositoryInterface{
+class RegisterRepository implements RegisterRepositoryInterface{
+    /**
+     * @var RequestFactory
+     */
+    protected $requestFactory;
+
+    /**
+     * @var CustomerExtractor
+     */
+    protected $customerExtractor;
 
     /**
 	 * @var AccountManagementInterface
@@ -15,50 +24,71 @@ class LoginRepository implements LoginRepositoryInterface{
     protected $customerAccountManagement;
     
     /**
-	 * LoginRepository constructor.
+	 * RegisterRepository constructor.
+     * @param RequestFactory $requestFactory
+     * @param CustomerExtractor $customerExtractor
 	 * @param AccountManagementInterface $customerAccountManagement
 	 */
 
-    public function __construct(AccountManagementInterface $customerAccountManagement){
+    public function __construct(AccountManagementInterface $customerAccountManagement,
+                                    RequestFactory $requestFactory,
+                                    CustomerExtractor $customerExtractor,
+    ){
+        
         $this->customerAccountManagement = $customerAccountManagement;
+        $this->requestFactory = $requestFactory;
+        $this->customerExtractor = $customerExtractor;
     } 
 
     /**
-	 * Get Product by its ID
+	 * Register a user
 	 * @param string $email
      * @param string $password
-	 * @throws EmailNotConfirmedException
+     * @param string $firstname
+     * @param string $lastname
+	 * @throws AlreadyExistsException
      * @throws AuthenticationException
 	 */
 
-    public function login($email, $password){
-        $login = array();
+    public function register($email, $password, $firstname, $lastname){
+        $register = array();
         if($email)
-            $login['username'] = $email;
+            $register['username'] = $email;
         if($password)
-            $login['password'] = $password;
+            $register['password'] = $password;
+        if($firstname)
+            $register['firstname'] = $firstname;
+        if($lastname)
+            $register['lastname'] = $lastname;
+               
+        $request = $this->requestFactory->create();
+        $request->setParams($register);
         
-        if(!empty($login['username']) && !empty($login['password'])){
+        if(!empty($register['username']) && 
+            !empty($register['password']) &&
+            !empty($register['firstname']) &&
+            !empty($register['lastname'])){
             try{
+                $customer = $this->customerExtractor->extract('customer_account_create', $request);
                 $customer = $this->customerAccountManagement
-                                ->authenticate($login['username'], $login['password']);
+                                ->createAccount($customer, $register['password']);
                 $code = 1;
                 $data = array('id'=>$customer->getId(),
                             'username'=>$customer->getEmail(),
-                            'name'=>ucwords($customer->getFirstName().' '. $customer->getLastName())
+                            'firstname'=> $customer->getFirstName(),
+                            'lastname'=>$customer->getLastName()
             );
-            }catch(EmailNotConfirmedException $e){
-                $value = $this->customerUrl->getEmailConfirmationUrl($login['username']);
-                $data = __(
-                    'This account is not confirmed.'.'<a href="%1">Click here</a> to resend confirmation mail.'. $value
-                );
-                $code = array('status'=>0,'data'=>$data);
-            }catch(AuthenticationException $e){
+            }
+            catch(AlreadyExistsException $e){
+                $data = __('Invalid login or password.');
+                $code = 0;
+            }
+            catch(AuthenticationException $e){
                 $data = __('Invalid login or password.');
                 $code = 0;
             }
         }else{
-            $data = __('Invalid login or password.');
+            $data = __('Invalid details.');
             $code = 0;
         }
         $result = array(array('data'=>$data, 'status'=>$code));

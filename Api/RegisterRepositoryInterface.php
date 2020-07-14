@@ -4,6 +4,7 @@ namespace Neptune\FirstModule\Api;
 
 
 use Magento\Framework\Exception\AuthenticationException;
+use Magento\Framework\Exception\AlreadyExistsException;
 /**
  * Neptune Api to get login customer
  */
@@ -16,7 +17,8 @@ interface RegisterRepositoryInterface{
 	 *@param string $password
 	 *@param string $firstname
 	 *@param string $lastname
-     *@return array $data
+	 *@return array $data
+	 *@throws AlreadyExistsException
 	 *@throws AuthenticationException
 	 */
 

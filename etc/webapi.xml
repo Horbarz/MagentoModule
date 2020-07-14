@@ -15,8 +15,14 @@ xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd"
        </resources>
     </route>
 	<!-- Add user when correct registration details are provided -->
-	<route url="/V1/badgemakerapi/addUser" method="POST">
+	<route url="/default/V1/badgemakerapi/addUser" method="POST">
        <service class="Neptune\FirstModule\Api\RegisterRepositoryInterface" method="register"/>
+       <resources>
+           <resource ref="anonymous"/>
+       </resources>
+    </route>
+    <route url="/default/V1/badgemakerapi/getCurrentUser" method="GET">
+       <service class="Neptune\FirstModule\Api\CurrentUserRepositoryInterface" method="getCurrentUser"/>
        <resources>
            <resource ref="anonymous"/>
        </resources>

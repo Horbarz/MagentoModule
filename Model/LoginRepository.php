@@ -42,7 +42,7 @@ class LoginRepository implements LoginRepositoryInterface{
             try{
                 $customer = $this->customerAccountManagement
                                 ->authenticate($login['username'], $login['password']);
-                $code = 1;
+                $error = false;
                 $data = array('id'=>$customer->getId(),
                             'username'=>$customer->getEmail(),
                             'name'=>ucwords($customer->getFirstName().' '. $customer->getLastName())
@@ -52,16 +52,16 @@ class LoginRepository implements LoginRepositoryInterface{
                 $data = __(
                     'This account is not confirmed.'.'<a href="%1">Click here</a> to resend confirmation mail.'. $value
                 );
-                $code = array('status'=>0,'data'=>$data);
+                $error = array('status'=>0,'data'=>$data);
             }catch(AuthenticationException $e){
                 $data = __('Invalid login or password.');
-                $code = 0;
+                $error = true;
             }
         }else{
             $data = __('Invalid login or password.');
-            $code = 0;
+            $error = true;
         }
-        $result = array(array('data'=>$data, 'status'=>$code));
+        $result = array(array('data'=>$data, 'error'=>$error));
         return $result;
     }
 }
